@@ -1,0 +1,7 @@
+{
+  "name": "WAMAS - Wedding Business ERP",
+  "description": "نظام تشغيل ومحاسبة مستلزمات الأعراس والتأجير الشامل مع منع التعارض والتوثيق المصور وإدارة المهام",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
