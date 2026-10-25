@@ -3,7 +3,7 @@ import {
   Crown, Sparkles, Search, Bell, Plus, ShieldCheck, 
   RefreshCw, UserCheck, AlertTriangle, CheckCircle, ChevronDown
 } from 'lucide-react';
-import { User, UserRole } from '../types';
+import { User, UserRole, SyncStatus } from '../types';
 
 interface HeaderProps {
   currentUser: User;
@@ -16,6 +16,10 @@ interface HeaderProps {
   lateContractsCount: number;
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  syncStatus?: SyncStatus;
+  outboxCount?: number;
+  lastSyncTime?: string;
+  onTriggerSync?: () => void;
 }
 
 export const ROLE_LABELS: Record<UserRole, { label: string; badgeColor: string }> = {
@@ -27,7 +31,9 @@ export const ROLE_LABELS: Record<UserRole, { label: string; badgeColor: string }
   CASHIER: { label: 'الكاشير والصندوق', badgeColor: 'bg-teal-800 text-teal-100 border-teal-500' },
   WAREHOUSE: { label: 'مسؤول المخزن والفحص', badgeColor: 'bg-slate-700 text-slate-100 border-slate-500' },
   TAILOR: { label: 'المشغل والخياط', badgeColor: 'bg-pink-800 text-pink-100 border-pink-500' },
-  DELIVERY: { label: 'فريق التوصيل والتركيب', badgeColor: 'bg-indigo-800 text-indigo-100 border-indigo-500' }
+  DELIVERY: { label: 'فريق التوصيل والتركيب', badgeColor: 'bg-indigo-800 text-indigo-100 border-indigo-500' },
+  PURCHASING_MANAGER: { label: 'مدير المشتريات والموردين', badgeColor: 'bg-cyan-800 text-cyan-100 border-cyan-500' },
+  VIEWER: { label: 'مشاهد / تدقيق فقط', badgeColor: 'bg-zinc-700 text-zinc-100 border-zinc-500' }
 };
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,7 +46,11 @@ export const Header: React.FC<HeaderProps> = ({
   overdueTasksCount,
   lateContractsCount,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  syncStatus = 'ONLINE',
+  outboxCount = 0,
+  lastSyncTime = 'الآن',
+  onTriggerSync
 }) => {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -58,10 +68,38 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-xl tracking-wider text-amber-300 font-serif">WAMAS</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-medium">ERP v1.1</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-medium">ERP v2.0</span>
               </div>
-              <p className="text-[11px] text-purple-200/80 -mt-0.5 hidden sm:block">نظام تشغيل ومحاسبة مستلزمات الأعراس والتأجير المتكامل</p>
+              <p className="text-[11px] text-purple-200/80 -mt-0.5 hidden sm:block">نظام تشغيل ومحاسبة وتصنيع مستلزمات الأعراس الشامل</p>
             </div>
+          </div>
+
+          {/* Sync Engine Indicator (BR-29, BR-30) */}
+          <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-purple-900/50 border border-purple-700/60 text-xs">
+            <div className={`w-2.5 h-2.5 rounded-full ${
+              syncStatus === 'ONLINE'
+                ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-pulse'
+                : syncStatus === 'SYNCING'
+                ? 'bg-amber-400 animate-spin'
+                : 'bg-slate-400'
+            }`} />
+            <span className="font-medium text-purple-100">
+              {syncStatus === 'ONLINE' ? 'متصل (Online)' : syncStatus === 'SYNCING' ? 'جاري التزامن...' : 'غير متصل (Offline)'}
+            </span>
+            {outboxCount > 0 && (
+              <span className="px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-300 font-mono text-[10px] border border-amber-400/30">
+                {outboxCount} معلقة
+              </span>
+            )}
+            {onTriggerSync && (
+              <button
+                onClick={onTriggerSync}
+                title="تزامن فوري"
+                className="hover:text-amber-300 text-purple-300 transition cursor-pointer p-0.5"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Unified Quick Search Bar */}

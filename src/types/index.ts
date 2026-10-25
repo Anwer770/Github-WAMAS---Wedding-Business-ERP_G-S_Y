@@ -13,16 +13,21 @@ export type UserRole =
   | 'CASHIER' // الكاشير - POS + سندات قبض وصرف + الصندوق
   | 'WAREHOUSE' // موظف المخزن - حالة الأصناف + تسليم/استلام QR
   | 'TAILOR' // الخياط - أوامر التعديل + المقاسات
-  | 'DELIVERY'; // موظف التوصيل - مهام التوصيل والتركيب
+  | 'DELIVERY' // موظف التوصيل - مهام التوصيل والتركيب
+  | 'PURCHASING_MANAGER' // مدير المشتريات والموردين
+  | 'VIEWER'; // مشاهد / تقارير فقط
 
 export interface User {
   id: string;
   name: string;
+  username: string;
   role: UserRole;
   phone: string;
   email: string;
   avatar?: string;
   branchId: string;
+  status: 'ACTIVE' | 'SUSPENDED';
+  lastLogin?: string;
 }
 
 // 2. 14 Operational Statuses for Product Units
@@ -406,4 +411,196 @@ export interface KoshaProject {
   status: 'SCHEDULED' | 'ON_WAY' | 'INSTALLING' | 'COMPLETED' | 'TEARDOWN_IN_PROGRESS' | 'FINISHED';
   componentsList: { name: string; checked: boolean }[];
   photos: { stage: string; url: string; timestamp: string }[];
+}
+
+// 12. Unit 6: Manufacturing Module (التصنيع وأوامر الشغل)
+export type ManufacturingOrderStatus =
+  | 'DRAFT'
+  | 'CONFIRMED'
+  | 'IN_PROGRESS'
+  | 'QUALITY_CHECK'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'ON_HOLD';
+
+export interface BillOfMaterialItem {
+  id: string;
+  rawMaterialId: string;
+  rawMaterialName: string;
+  requiredQuantity: number;
+  unit: string; // متر، كيلو، قطعة، حبة، بكرة
+  costPerUnit: number;
+  availableStock: number;
+  status: 'AVAILABLE' | 'NEEDS_PURCHASE';
+  isReserved: boolean;
+}
+
+export interface ProductionStageRecord {
+  stageNumber: number;
+  stageNameAr: string; // قص الأقمشة / الخياطة الأولية / التطريز والزينة / الكي والتشطيب / فحص الجودة / التغليف
+  supervisor: string;
+  dueDate: string;
+  completionPercent: number; // 0 - 100
+  laborCost: number;
+  notes?: string;
+  completedAt?: string;
+}
+
+export interface ManufacturingOrder {
+  id: string;
+  orderNumber: string; // MO-2026-XXXXX
+  type: 'DRESS' | 'KOSHA' | 'DECOR' | 'ACCESSORY' | 'OTHER';
+  outputProductId: string;
+  outputProductName: string;
+  outputProductSku: string;
+  quantity: number;
+  customerSpecs: string; // مقاسات، ألوان، تفاصيل
+  startDate: string;
+  targetEndDate: string;
+  priority: 'URGENT' | 'HIGH' | 'NORMAL';
+  status: ManufacturingOrderStatus;
+  assignedToName: string;
+  branchName: string;
+  bom: BillOfMaterialItem[];
+  stages: ProductionStageRecord[];
+  rawMaterialsCost: number;
+  laborCost: number;
+  overheadCost: number;
+  totalCost: number;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export type JobOrderType = 'SIZE_ALTERATION' | 'DAMAGE_REPAIR' | 'REFURBISHMENT' | 'SPECIAL_CLEANING';
+
+export interface JobOrder {
+  id: string;
+  orderNumber: string; // JO-2026-XXXXX
+  type: JobOrderType;
+  productUnitId: string;
+  productUnitSerial: string;
+  productName: string;
+  specs: string;
+  materialsConsumed: string;
+  laborHours: number;
+  totalCost: number;
+  contractId?: string;
+  assignedTailor: string;
+  status: 'PENDING' | 'IN_PROGRESS' | 'DONE';
+  createdAt: string;
+}
+
+// 13. Unit 7: Suppliers & Purchasing (الموردون والمشتريات)
+export type SupplierCategory = 'FABRICS' | 'ACCESSORIES' | 'EQUIPMENT' | 'SERVICES' | 'OTHER';
+
+export interface Supplier {
+  id: string;
+  code: string; // SUP-2026-XXXX
+  name: string;
+  category: SupplierCategory;
+  contactPerson: string;
+  phone: string;
+  whatsapp?: string;
+  email: string;
+  address: string;
+  taxNumber: string;
+  crNumber: string;
+  paymentTerms: 'CASH' | 'NET_30' | 'NET_60' | 'INSTALLMENTS';
+  creditLimit: number;
+  currentBalance: number; // مستحقات المورد
+  rating: number; // 1 - 5
+  status: 'ACTIVE' | 'SUSPENDED';
+  notes?: string;
+}
+
+export type PurchaseOrderStatus = 'DRAFT' | 'APPROVED' | 'SENT' | 'PARTIAL' | 'RECEIVED' | 'CANCELLED';
+
+export interface PurchaseOrderItem {
+  id: string;
+  rawMaterialId: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  taxPercent: number; // 15%
+  subtotal: number;
+  total: number;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  poNumber: string; // PO-2026-XXXXX
+  supplierId: string;
+  supplierName: string;
+  orderDate: string;
+  expectedDeliveryDate: string;
+  branchId: string;
+  items: PurchaseOrderItem[];
+  subtotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  totalAmount: number;
+  status: PurchaseOrderStatus;
+  paymentTerms: string;
+  needsApproval: boolean; // if totalAmount > threshold (e.g. 5,000 SAR)
+  approvedBy?: string;
+  approvedAt?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+// 14. Flexible RBAC & Permission Matrix (الصلاحيات المرنة)
+export type SystemModule =
+  | 'BOOKINGS'
+  | 'SALES'
+  | 'PURCHASING'
+  | 'MANUFACTURING'
+  | 'INVENTORY'
+  | 'CHART_OF_ACCOUNTS'
+  | 'FINANCIAL_REPORTS'
+  | 'USER_MANAGEMENT'
+  | 'COLLATERAL_VAULT'
+  | 'TASKS'
+  | 'KOSHA'
+  | 'SETTINGS';
+
+export type PermissionAction = 'VIEW' | 'CREATE' | 'EDIT' | 'DELETE' | 'APPROVE' | 'EXPORT';
+
+export type RolePermissionMatrix = Record<UserRole, Record<SystemModule, Record<PermissionAction, boolean>>>;
+
+// 15. System Settings (الإعدادات الشاملة)
+export interface SystemSettings {
+  companyNameAr: string;
+  companyNameEn: string;
+  taxNumber: string;
+  crNumber: string;
+  phone: string;
+  email: string;
+  address: string;
+  fiscalYearStart: string;
+  fiscalYearEnd: string;
+  isFiscalPeriodLocked: boolean;
+  currency: string;
+  vatRatePercent: number;
+  poApprovalThreshold: number; // e.g. 5000 SAR
+  minRentalDepositPercent: number; // 25%
+  minRentalCollateralPercent: number; // 30%
+  bookingBufferHours: number; // 48
+  laundryBufferHours: number; // 24
+  dailyLatePenaltyPercent: number; // 15%
+  paperSize: 'A4' | 'THERMAL_80MM';
+  autoSyncIntervalMinutes: number;
+}
+
+// 16. Offline & Sync Engine
+export type SyncStatus = 'ONLINE' | 'SYNCING' | 'OFFLINE';
+
+export interface SyncOutboxItem {
+  id: string;
+  idempotencyKey: string;
+  entityType: string;
+  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  payload: any;
+  createdAt: string;
+  attempts: number;
 }

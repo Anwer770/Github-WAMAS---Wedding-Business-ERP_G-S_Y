@@ -18,6 +18,10 @@ import { PosCashierView } from './components/views/PosCashierView';
 import { AccountingView } from './components/views/AccountingView';
 import { CrmCustomersView } from './components/views/CrmCustomersView';
 import { KoshaProjectsView } from './components/views/KoshaProjectsView';
+import { ManufacturingView } from './components/views/ManufacturingView';
+import { SuppliersPurchasingView } from './components/views/SuppliersPurchasingView';
+import { PermissionsMatrixView } from './components/views/PermissionsMatrixView';
+import { SystemSettingsView } from './components/views/SystemSettingsView';
 import { DatabaseSchemaView } from './components/views/DatabaseSchemaView';
 import { AcceptanceTestsView } from './components/views/AcceptanceTestsView';
 import { 
@@ -552,6 +556,23 @@ export default function App() {
         lateContractsCount={lateContractsCount}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        syncStatus={state.syncStatus}
+        outboxCount={state.outbox.length}
+        lastSyncTime={state.lastSyncTime}
+        onTriggerSync={() => {
+          setState(prev => ({
+            ...prev,
+            syncStatus: 'SYNCING'
+          }));
+          setTimeout(() => {
+            setState(prev => ({
+              ...prev,
+              syncStatus: 'ONLINE',
+              lastSyncTime: 'الآن (متزامن)',
+              outbox: []
+            }));
+          }, 1000);
+        }}
       />
 
       {/* Main Layout Area */}
@@ -643,6 +664,38 @@ export default function App() {
             <KoshaProjectsView
               state={state}
               onUpdateComponentCheck={handleUpdateKoshaComponent}
+            />
+          )}
+
+          {activeTab === 'MANUFACTURING' && (
+            <ManufacturingView
+              state={state}
+              onUpdateState={setState}
+              currentUserRole={state.currentUser.role}
+            />
+          )}
+
+          {activeTab === 'SUPPLIERS_PURCHASING' && (
+            <SuppliersPurchasingView
+              state={state}
+              onUpdateState={setState}
+              currentUserRole={state.currentUser.role}
+            />
+          )}
+
+          {activeTab === 'PERMISSIONS_RBAC' && (
+            <PermissionsMatrixView
+              state={state}
+              onUpdateState={setState}
+              currentUserRole={state.currentUser.role}
+            />
+          )}
+
+          {activeTab === 'SYSTEM_SETTINGS' && (
+            <SystemSettingsView
+              state={state}
+              onUpdateState={setState}
+              currentUserRole={state.currentUser.role}
             />
           )}
 

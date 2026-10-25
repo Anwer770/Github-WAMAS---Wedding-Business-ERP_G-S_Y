@@ -5,20 +5,24 @@
 
 import {
   User, Product, ProductUnit, Customer, Booking, RentalContract,
-  Collateral, Inspection, Task, Account, JournalEntry, KoshaProject
+  Collateral, Inspection, Task, Account, JournalEntry, KoshaProject,
+  ManufacturingOrder, JobOrder, Supplier, PurchaseOrder,
+  RolePermissionMatrix, SystemSettings, SyncOutboxItem, UserRole, SystemModule, PermissionAction
 } from '../types';
 import { INITIAL_CHART_OF_ACCOUNTS } from './doubleEntryAccountingService';
 
 export const INITIAL_USERS: User[] = [
-  { id: 'usr-1', name: 'أ. عبد الله باحارث', role: 'OWNER', phone: '0501234567', email: 'owner@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-  { id: 'usr-2', name: 'سارة القحطاني', role: 'GENERAL_MANAGER', phone: '0559876543', email: 'gm@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
-  { id: 'usr-3', name: 'أحمد المنصوري', role: 'ACCOUNTANT', phone: '0561122334', email: 'finance@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
-  { id: 'usr-4', name: 'نورة العتيبي', role: 'SALES', phone: '0543322114', email: 'sales@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-  { id: 'usr-5', name: 'فهد الشمري', role: 'RENTAL_AGENT', phone: '0537788990', email: 'rentals@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
-  { id: 'usr-6', name: 'مريم الحربي', role: 'CASHIER', phone: '0594455667', email: 'cashier@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150' },
-  { id: 'usr-7', name: 'طارق العسيري', role: 'WAREHOUSE', phone: '0581239876', email: 'warehouse@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' },
-  { id: 'usr-8', name: 'المعلم رضوان خان', role: 'TAILOR', phone: '0578899112', email: 'tailor@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150' },
-  { id: 'usr-9', name: 'سلطان الدوسري', role: 'DELIVERY', phone: '0523344556', email: 'delivery@wamas-app.com', branchId: 'br-1', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150' }
+  { id: 'usr-1', name: 'أ. عبد الله باحارث', username: 'owner', role: 'OWNER', phone: '0501234567', email: 'owner@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 10:30', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
+  { id: 'usr-2', name: 'سارة القحطاني', username: 'gm_sarah', role: 'GENERAL_MANAGER', phone: '0559876543', email: 'gm@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 09:15', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
+  { id: 'usr-3', name: 'أحمد المنصوري', username: 'acc_ahmed', role: 'ACCOUNTANT', phone: '0561122334', email: 'finance@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 08:45', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
+  { id: 'usr-4', name: 'نورة العتيبي', username: 'sales_noura', role: 'SALES', phone: '0543322114', email: 'sales@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 11:00', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
+  { id: 'usr-5', name: 'فهد الشمري', username: 'rent_fahad', role: 'RENTAL_AGENT', phone: '0537788990', email: 'rentals@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-24 16:20', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
+  { id: 'usr-6', name: 'مريم الحربي', username: 'cashier_maryam', role: 'CASHIER', phone: '0594455667', email: 'cashier@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 10:00', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150' },
+  { id: 'usr-7', name: 'طارق العسيري', username: 'store_tariq', role: 'WAREHOUSE', phone: '0581239876', email: 'warehouse@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 07:30', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' },
+  { id: 'usr-8', name: 'المعلم رضوان خان', username: 'tailor_radwan', role: 'TAILOR', phone: '0578899112', email: 'tailor@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-24 18:00', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150' },
+  { id: 'usr-9', name: 'سلطان الدوسري', username: 'driver_sultan', role: 'DELIVERY', phone: '0523344556', email: 'delivery@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 09:40', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150' },
+  { id: 'usr-10', name: 'خالد الرويلي', username: 'proc_khaled', role: 'PURCHASING_MANAGER', phone: '0519988776', email: 'purchasing@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-25 08:00', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
+  { id: 'usr-11', name: 'منى السليمان', username: 'audit_mona', role: 'VIEWER', phone: '0533322119', email: 'viewer@wamas-app.com', branchId: 'br-1', status: 'ACTIVE', lastLogin: '2026-10-23 14:10', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' }
 ];
 
 export const INITIAL_PRODUCTS: Product[] = [
@@ -680,3 +684,370 @@ export const INITIAL_KOSHA_PROJECTS: KoshaProject[] = [
     ]
   }
 ];
+
+export const INITIAL_SUPPLIERS: Supplier[] = [
+  {
+    id: 'sup-1',
+    code: 'SUP-2026-001',
+    name: 'شركة الحرير الملكي للأقمشة الفاخرة',
+    category: 'FABRICS',
+    contactPerson: 'الشيخ منصور القاسمي',
+    phone: '0505544332',
+    whatsapp: '966505544332',
+    email: 'info@royal-silk.sa',
+    address: 'الرياض - شارع المعيقلية التجاري، مبنى الأقمشة الفاخرة',
+    taxNumber: '310234567800003',
+    crNumber: '1010345678',
+    paymentTerms: 'NET_30',
+    creditLimit: 50000,
+    currentBalance: 12400,
+    rating: 5,
+    status: 'ACTIVE',
+    notes: 'المورد المعتمد لأقمشة الميكادو والحرير الإيطالي والدانتيل الفرنسي كوتور.'
+  },
+  {
+    id: 'sup-2',
+    code: 'SUP-2026-002',
+    name: 'مصنع لوريكس للتطريز والإكسسوارات الكريستالية',
+    category: 'ACCESSORIES',
+    contactPerson: 'م. سامح الجوهري',
+    phone: '0554433221',
+    whatsapp: '966554433221',
+    email: 'sales@lurex-crafts.com',
+    address: 'جدة - حي الصفا الصناعي، مجمع الحرفيين',
+    taxNumber: '310987654300003',
+    crNumber: '4030987654',
+    paymentTerms: 'NET_30',
+    creditLimit: 30000,
+    currentBalance: 8500,
+    rating: 4,
+    status: 'ACTIVE',
+    notes: 'متخصص بتوريد حبات كريستال سواروفسكي الأصلية والخرز اللؤلؤي والشرائط المذهبة.'
+  },
+  {
+    id: 'sup-3',
+    code: 'SUP-2026-003',
+    name: 'مؤسسة أفق الكوش للتجهيزات والديكور',
+    category: 'EQUIPMENT',
+    contactPerson: 'سلمان العوفي',
+    phone: '0567788991',
+    whatsapp: '966567788991',
+    email: 'contact@ofok-kosha.com',
+    address: 'الرياض - صناعية الشفاء، مستودع D-14',
+    taxNumber: '311234598700003',
+    crNumber: '1010654321',
+    paymentTerms: 'CASH',
+    creditLimit: 20000,
+    currentBalance: 0,
+    rating: 5,
+    status: 'ACTIVE',
+    notes: 'توريد هياكل الألمنيوم المقوى، الشاشات التفاعلية، ووحدات الإضاءة الذكية المتحركة.'
+  }
+];
+
+export const INITIAL_PURCHASE_ORDERS: PurchaseOrder[] = [
+  {
+    id: 'po-1',
+    poNumber: 'PO-2026-00101',
+    supplierId: 'sup-1',
+    supplierName: 'شركة الحرير الملكي للأقمشة الفاخرة',
+    orderDate: '2026-10-20',
+    expectedDeliveryDate: '2026-10-28',
+    branchId: 'br-1',
+    items: [
+      {
+        id: 'poi-1',
+        rawMaterialId: 'mat-1',
+        name: 'قماش ميكادو حرير طبيعي ناصع البياض (إيطالي)',
+        quantity: 50,
+        unit: 'متر',
+        unitPrice: 180,
+        taxPercent: 15,
+        subtotal: 9000,
+        total: 10350
+      },
+      {
+        id: 'poi-2',
+        rawMaterialId: 'mat-2',
+        name: 'دانتيل فرنسي كوردونيه مطرز باللؤلؤ',
+        quantity: 20,
+        unit: 'متر',
+        unitPrice: 320,
+        taxPercent: 15,
+        subtotal: 6400,
+        total: 7360
+      }
+    ],
+    subtotal: 15400,
+    taxAmount: 2310,
+    discountAmount: 0,
+    totalAmount: 17710,
+    status: 'APPROVED',
+    paymentTerms: 'آجل 30 يوم',
+    needsApproval: true,
+    approvedBy: 'سارة القحطاني (المدير العام)',
+    approvedAt: '2026-10-21 11:30',
+    notes: 'طلبية عاجلة لتصنيع موديلات الموسم الجديد ومجموعة أعراس الخريف.',
+    createdAt: '2026-10-20T10:00:00Z'
+  },
+  {
+    id: 'po-2',
+    poNumber: 'PO-2026-00102',
+    supplierId: 'sup-2',
+    supplierName: 'مصنع لوريكس للتطريز والإكسسوارات الكريستالية',
+    orderDate: '2026-10-24',
+    expectedDeliveryDate: '2026-10-30',
+    branchId: 'br-1',
+    items: [
+      {
+        id: 'poi-3',
+        rawMaterialId: 'mat-3',
+        name: 'أحجار كريستال سواروفسكي عاكسة (علبة 1440 حبة)',
+        quantity: 10,
+        unit: 'علبة',
+        unitPrice: 240,
+        taxPercent: 15,
+        subtotal: 2400,
+        total: 2760
+      },
+      {
+        id: 'poi-4',
+        rawMaterialId: 'mat-4',
+        name: 'خيوط تطريز حرير مذهبة ومفضضة فاخرة',
+        quantity: 15,
+        unit: 'بكرة',
+        unitPrice: 85,
+        taxPercent: 15,
+        subtotal: 1275,
+        total: 1466.25
+      }
+    ],
+    subtotal: 3675,
+    taxAmount: 551.25,
+    discountAmount: 0,
+    totalAmount: 4226.25,
+    status: 'DRAFT',
+    paymentTerms: 'آجل 30 يوم',
+    needsApproval: false, // Under 5000 threshold
+    notes: 'مستلزمات مشغل الخياطة والتطريز الدقيق لأوامر التعديل.',
+    createdAt: '2026-10-24T14:30:00Z'
+  }
+];
+
+export const INITIAL_MANUFACTURING_ORDERS: ManufacturingOrder[] = [
+  {
+    id: 'mo-1',
+    orderNumber: 'MO-2026-00045',
+    type: 'DRESS',
+    outputProductId: 'prod-1',
+    outputProductName: 'فستان زفاف كوتور "أميرة الأندلس"',
+    outputProductSku: 'WD-ANDALUSIA-03',
+    quantity: 1,
+    customerSpecs: 'مقاس العروس: صدر 88 سم، خصر 66 سم، أرداف 96 سم. دانتيل ممتد للأكمام مع كورسيه شفاف مبطن وديل ملكي 2.5 متر.',
+    startDate: '2026-10-15',
+    targetEndDate: '2026-11-02',
+    priority: 'HIGH',
+    status: 'IN_PROGRESS',
+    assignedToName: 'المعلم رضوان خان',
+    branchName: 'الفرع الرئيسي - مشغل الكوتور',
+    bom: [
+      {
+        id: 'bom-1',
+        rawMaterialId: 'mat-1',
+        rawMaterialName: 'قماش ميكادو حرير طبيعي ناصع البياض',
+        requiredQuantity: 12,
+        unit: 'متر',
+        costPerUnit: 180,
+        availableStock: 25,
+        status: 'AVAILABLE',
+        isReserved: true
+      },
+      {
+        id: 'bom-2',
+        rawMaterialId: 'mat-2',
+        rawMaterialName: 'دانتيل فرنسي كوتور مطرز',
+        requiredQuantity: 6,
+        unit: 'متر',
+        costPerUnit: 320,
+        availableStock: 14,
+        status: 'AVAILABLE',
+        isReserved: true
+      },
+      {
+        id: 'bom-3',
+        rawMaterialId: 'mat-3',
+        rawMaterialName: 'أحجار كريستال سواروفسكي',
+        requiredQuantity: 2,
+        unit: 'علبة',
+        costPerUnit: 240,
+        availableStock: 8,
+        status: 'AVAILABLE',
+        isReserved: true
+      }
+    ],
+    stages: [
+      { stageNumber: 1, stageNameAr: 'قص الأقمشة والبطانة', supervisor: 'المعلم رضوان خان', dueDate: '2026-10-18', completionPercent: 100, laborCost: 350, completedAt: '2026-10-18 16:00', notes: 'تم القص بدقة متناهية حسب الباترون المعتمد.' },
+      { stageNumber: 2, stageNameAr: 'الخياطة الأولية وتجميع الكورسيه', supervisor: 'المعلم رضوان خان', dueDate: '2026-10-22', completionPercent: 100, laborCost: 750, completedAt: '2026-10-22 17:30', notes: 'تم بناء دعامات العظام الداخلية والشاسيه النحيف.' },
+      { stageNumber: 3, stageNameAr: 'التطريز اليدوي وتثبيت الكريستال', supervisor: 'مختصة الزينة ليلى', dueDate: '2026-10-28', completionPercent: 65, laborCost: 1100, notes: 'جاري تثبيت حبات الكريستال على الأكتاف ومحيط الخصر.' },
+      { stageNumber: 4, stageNameAr: 'الكي البخاري والتشطيب النهائي', supervisor: 'فني التشطيب حسام', dueDate: '2026-10-30', completionPercent: 0, laborCost: 250 },
+      { stageNumber: 5, stageNameAr: 'فحص الجودة والمقاسات بالمانيكان', supervisor: 'سارة القحطاني', dueDate: '2026-10-31', completionPercent: 0, laborCost: 150 },
+      { stageNumber: 6, stageNameAr: 'التغليف الواقي والتعليق بصندوق مخملي', supervisor: 'طارق العسيري', dueDate: '2026-11-01', completionPercent: 0, laborCost: 100 }
+    ],
+    rawMaterialsCost: 4560,
+    laborCost: 2700,
+    overheadCost: 650,
+    totalCost: 7910,
+    createdAt: '2026-10-15T09:00:00Z'
+  }
+];
+
+export const INITIAL_JOB_ORDERS: JobOrder[] = [
+  {
+    id: 'jo-1',
+    orderNumber: 'JO-2026-00018',
+    type: 'SIZE_ALTERATION',
+    productUnitId: 'u-1',
+    productUnitSerial: 'WD-01-SN001',
+    productName: 'فستان زفاف ملكي "لؤلؤة الخليج"',
+    specs: 'تضييق محيط الخصر بمقدار 2 سم وتقصير الطول 1.5 سم حسب بروفة العروس ريم آل سعود.',
+    materialsConsumed: 'خيوط حريرية متينة + شريط سحاب داخلي',
+    laborHours: 4,
+    totalCost: 280,
+    contractId: 'cnt-1',
+    assignedTailor: 'المعلم رضوان خان',
+    status: 'IN_PROGRESS',
+    createdAt: '2026-10-24T12:00:00Z'
+  },
+  {
+    id: 'jo-2',
+    orderNumber: 'JO-2026-00019',
+    type: 'DAMAGE_REPAIR',
+    productUnitId: 'u-2',
+    productUnitSerial: 'WD-02-SN002',
+    productName: 'فستان زفاف برنسيس "رويال ألف ليلة"',
+    specs: 'إعادة تثبيت 14 حبة كريستال سواروفسكي مفقودة في محيط الذيل السفلي وإصلاح ثنية التول.',
+    materialsConsumed: '14 حبة كريستال سواروفسكي + صمغ نسيج ألماني',
+    laborHours: 2.5,
+    totalCost: 175,
+    contractId: 'cnt-2',
+    assignedTailor: 'المعلم رضوان خان',
+    status: 'DONE',
+    createdAt: '2026-10-23T15:30:00Z'
+  }
+];
+
+// 14 Default Roles Permission Matrix
+const ALL_MODULES: SystemModule[] = [
+  'BOOKINGS', 'SALES', 'PURCHASING', 'MANUFACTURING', 'INVENTORY',
+  'CHART_OF_ACCOUNTS', 'FINANCIAL_REPORTS', 'USER_MANAGEMENT',
+  'COLLATERAL_VAULT', 'TASKS', 'KOSHA', 'SETTINGS'
+];
+
+const ALL_ACTIONS: PermissionAction[] = ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'APPROVE', 'EXPORT'];
+
+function createFullAccess(): Record<SystemModule, Record<PermissionAction, boolean>> {
+  const result: any = {};
+  ALL_MODULES.forEach(mod => {
+    result[mod] = {};
+    ALL_ACTIONS.forEach(act => {
+      result[mod][act] = true;
+    });
+  });
+  return result;
+}
+
+function createLimitedAccess(allowView: SystemModule[], allowCreateEdit: SystemModule[] = []): Record<SystemModule, Record<PermissionAction, boolean>> {
+  const result: any = {};
+  ALL_MODULES.forEach(mod => {
+    result[mod] = {};
+    const canView = allowView.includes(mod);
+    const canMutate = allowCreateEdit.includes(mod);
+    ALL_ACTIONS.forEach(act => {
+      if (act === 'VIEW') result[mod][act] = canView;
+      else if (act === 'CREATE' || act === 'EDIT') result[mod][act] = canMutate;
+      else result[mod][act] = false;
+    });
+  });
+  return result;
+}
+
+export const INITIAL_PERMISSIONS_MATRIX: RolePermissionMatrix = {
+  OWNER: createFullAccess(),
+  GENERAL_MANAGER: {
+    ...createFullAccess(),
+    SETTINGS: { VIEW: true, CREATE: true, EDIT: true, DELETE: false, APPROVE: true, EXPORT: true },
+    USER_MANAGEMENT: { VIEW: true, CREATE: true, EDIT: true, DELETE: false, APPROVE: true, EXPORT: true }
+  },
+  ACCOUNTANT: createLimitedAccess(
+    ['BOOKINGS', 'SALES', 'PURCHASING', 'CHART_OF_ACCOUNTS', 'FINANCIAL_REPORTS', 'COLLATERAL_VAULT', 'INVENTORY', 'SETTINGS'],
+    ['SALES', 'PURCHASING', 'CHART_OF_ACCOUNTS', 'FINANCIAL_REPORTS', 'COLLATERAL_VAULT']
+  ),
+  SALES: createLimitedAccess(
+    ['BOOKINGS', 'SALES', 'INVENTORY', 'TASKS', 'KOSHA'],
+    ['BOOKINGS', 'SALES', 'TASKS']
+  ),
+  RENTAL_AGENT: createLimitedAccess(
+    ['BOOKINGS', 'INVENTORY', 'COLLATERAL_VAULT', 'TASKS'],
+    ['BOOKINGS', 'COLLATERAL_VAULT', 'TASKS']
+  ),
+  CASHIER: createLimitedAccess(
+    ['SALES', 'BOOKINGS', 'COLLATERAL_VAULT'],
+    ['SALES', 'COLLATERAL_VAULT']
+  ),
+  WAREHOUSE: createLimitedAccess(
+    ['INVENTORY', 'PURCHASING', 'MANUFACTURING', 'TASKS'],
+    ['INVENTORY', 'TASKS']
+  ),
+  TAILOR: createLimitedAccess(
+    ['MANUFACTURING', 'INVENTORY', 'TASKS'],
+    ['MANUFACTURING', 'TASKS']
+  ),
+  DELIVERY: createLimitedAccess(
+    ['KOSHA', 'TASKS'],
+    ['KOSHA', 'TASKS']
+  ),
+  PURCHASING_MANAGER: createLimitedAccess(
+    ['PURCHASING', 'INVENTORY', 'MANUFACTURING', 'TASKS'],
+    ['PURCHASING', 'TASKS']
+  ),
+  VIEWER: createLimitedAccess(
+    ['BOOKINGS', 'SALES', 'PURCHASING', 'MANUFACTURING', 'INVENTORY', 'FINANCIAL_REPORTS', 'TASKS', 'KOSHA'],
+    []
+  )
+};
+
+export const INITIAL_SYSTEM_SETTINGS: SystemSettings = {
+  companyNameAr: 'مؤسسة وهج العروس لمستلزمات وتجهيز الأعراس',
+  companyNameEn: 'Wahaj Al-Arous Wedding Boutique & Operations',
+  taxNumber: '310988776600003',
+  crNumber: '1010887766',
+  phone: '0112345678',
+  email: 'info@wamas-app.com',
+  address: 'المملكة العربية السعودية، الرياض، طريق الملك فهد',
+  fiscalYearStart: '2026-01-01',
+  fiscalYearEnd: '2026-12-31',
+  isFiscalPeriodLocked: false,
+  currency: 'ريال سعودي (SAR)',
+  vatRatePercent: 15,
+  poApprovalThreshold: 5000,
+  minRentalDepositPercent: 25,
+  minRentalCollateralPercent: 30,
+  bookingBufferHours: 48,
+  laundryBufferHours: 24,
+  dailyLatePenaltyPercent: 15,
+  paperSize: 'THERMAL_80MM',
+  autoSyncIntervalMinutes: 5
+};
+
+export const INITIAL_OUTBOX: SyncOutboxItem[] = [
+  {
+    id: 'outbox-1',
+    idempotencyKey: 'idemp-20261025-001',
+    entityType: 'RENTAL_CONTRACT',
+    action: 'UPDATE',
+    payload: { contractNumber: 'CONT-2026-0042', status: 'ACTIVE', stage: 8 },
+    createdAt: '2026-10-25 10:45:12',
+    attempts: 0
+  }
+];
+

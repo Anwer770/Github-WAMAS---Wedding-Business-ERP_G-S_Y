@@ -1,8 +1,7 @@
-import React from 'react';
 import {
   LayoutDashboard, CalendarRange, FileText, Camera, Shirt,
   ShieldAlert, CheckSquare, ShoppingCart, Scale, Users,
-  Sparkles, Database, CheckCircle2
+  Sparkles, Database, CheckCircle2, Factory, Truck, Sliders, Settings
 } from 'lucide-react';
 import { UserRole } from '../types';
 
@@ -18,6 +17,10 @@ export type NavTab =
   | 'ACCOUNTING_COA'
   | 'CRM_CUSTOMERS'
   | 'KOSHA_PROJECTS'
+  | 'MANUFACTURING'
+  | 'SUPPLIERS_PURCHASING'
+  | 'PERMISSIONS_RBAC'
+  | 'SYSTEM_SETTINGS'
   | 'DB_SCHEMA'
   | 'ACCEPTANCE_TESTS';
 
@@ -133,6 +136,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
       allowedRoles: ['OWNER', 'GENERAL_MANAGER', 'SALES', 'DELIVERY', 'WAREHOUSE']
     },
     {
+      id: 'MANUFACTURING',
+      label: 'التصنيع وأوامر الشغل',
+      subLabel: 'أوامر MO و BOM ومراحل المشغل',
+      icon: Factory,
+      allowedRoles: ['OWNER', 'GENERAL_MANAGER', 'TAILOR', 'WAREHOUSE', 'PURCHASING_MANAGER']
+    },
+    {
+      id: 'SUPPLIERS_PURCHASING',
+      label: 'الموردون والمشتريات',
+      subLabel: 'أوامر الشراء PO والاعتمادات',
+      icon: Truck,
+      allowedRoles: ['OWNER', 'GENERAL_MANAGER', 'ACCOUNTANT', 'PURCHASING_MANAGER']
+    },
+    {
+      id: 'PERMISSIONS_RBAC',
+      label: 'مصفوفة الصلاحيات (RBAC)',
+      subLabel: 'إدارة الأدوار والمستخدمين',
+      icon: Sliders,
+      allowedRoles: ['OWNER', 'GENERAL_MANAGER']
+    },
+    {
+      id: 'SYSTEM_SETTINGS',
+      label: 'الإعدادات وقفل الفترة',
+      subLabel: 'ضبط السياسات ومحرك Offline',
+      icon: Settings,
+      allowedRoles: ['OWNER', 'GENERAL_MANAGER', 'ACCOUNTANT']
+    },
+    {
       id: 'DB_SCHEMA',
       label: 'مخطط قاعدة البيانات (DDL)',
       subLabel: 'PostgreSQL & Prisma Schemas',
@@ -141,12 +172,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'ACCEPTANCE_TESTS',
-      label: 'جناح اختبارات القبول (28)',
+      label: 'جناح اختبارات القبول (30)',
       subLabel: 'فحص القواعد الذهبية الصارمة',
       icon: CheckCircle2,
-      badge: '28 فحص',
+      badge: '30 فحص',
       badgeColor: 'bg-emerald-600 text-white font-bold',
-      allowedRoles: ['OWNER', 'GENERAL_MANAGER', 'ACCOUNTANT', 'SALES', 'RENTAL_AGENT', 'CASHIER', 'WAREHOUSE', 'TAILOR', 'DELIVERY']
+      allowedRoles: ['OWNER', 'GENERAL_MANAGER', 'ACCOUNTANT', 'SALES', 'RENTAL_AGENT', 'CASHIER', 'WAREHOUSE', 'TAILOR', 'DELIVERY', 'PURCHASING_MANAGER', 'VIEWER']
     }
   ];
 

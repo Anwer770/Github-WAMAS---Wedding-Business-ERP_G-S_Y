@@ -305,6 +305,143 @@ CREATE TABLE tasks (
   is_deleted BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- ====================================================================
+-- WAMAS v2.0 Enterprise Modules: Manufacturing, Purchasing, Settings & Sync
+-- ====================================================================
+
+-- 1. Unit 6: Manufacturing (MO, BOM, Stages, Job Orders)
+CREATE TABLE manufacturing_orders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  order_number VARCHAR(100) UNIQUE NOT NULL,
+  type VARCHAR(50) NOT NULL, -- DRESS, KOSHA, DECOR, ACCESSORY
+  output_product_id UUID REFERENCES products(id),
+  quantity INT DEFAULT 1,
+  customer_specs TEXT,
+  start_date DATE NOT NULL,
+  target_end_date DATE NOT NULL,
+  priority VARCHAR(50) DEFAULT 'NORMAL',
+  status VARCHAR(50) DEFAULT 'DRAFT', -- DRAFT, CONFIRMED, IN_PROGRESS, QUALITY_CHECK, COMPLETED
+  assigned_to UUID REFERENCES users(id),
+  raw_materials_cost NUMERIC(14,2) DEFAULT 0,
+  labor_cost NUMERIC(14,2) DEFAULT 0,
+  overhead_cost NUMERIC(14,2) DEFAULT 0,
+  total_cost NUMERIC(14,2) DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  completed_at TIMESTAMPTZ
+);
+
+CREATE TABLE bill_of_materials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  manufacturing_order_id UUID NOT NULL REFERENCES manufacturing_orders(id) ON DELETE CASCADE,
+  raw_material_id UUID NOT NULL,
+  raw_material_name VARCHAR(255) NOT NULL,
+  required_quantity NUMERIC(10,2) NOT NULL,
+  unit VARCHAR(50) NOT NULL,
+  cost_per_unit NUMERIC(12,2) NOT NULL,
+  is_reserved BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE production_stages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  manufacturing_order_id UUID NOT NULL REFERENCES manufacturing_orders(id) ON DELETE CASCADE,
+  stage_number INT NOT NULL,
+  stage_name_ar VARCHAR(255) NOT NULL,
+  supervisor VARCHAR(255),
+  due_date DATE NOT NULL,
+  completion_percent INT DEFAULT 0,
+  labor_cost NUMERIC(12,2) DEFAULT 0,
+  completed_at TIMESTAMPTZ,
+  notes TEXT
+);
+
+CREATE TABLE job_orders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  order_number VARCHAR(100) UNIQUE NOT NULL,
+  type VARCHAR(50) NOT NULL, -- SIZE_ALTERATION, DAMAGE_REPAIR, REFURBISHMENT
+  product_unit_id UUID NOT NULL REFERENCES product_units(id),
+  specs TEXT NOT NULL,
+  materials_consumed TEXT,
+  labor_hours NUMERIC(6,2) DEFAULT 0,
+  total_cost NUMERIC(12,2) DEFAULT 0,
+  contract_id UUID REFERENCES rental_contracts(id),
+  assigned_tailor VARCHAR(255),
+  status VARCHAR(50) DEFAULT 'PENDING',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Unit 7: Suppliers & Purchasing (Suppliers, POs, Items)
+CREATE TABLE suppliers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  code VARCHAR(50) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  category VARCHAR(50) NOT NULL, -- FABRICS, ACCESSORIES, EQUIPMENT, SERVICES
+  contact_person VARCHAR(255),
+  phone VARCHAR(50) NOT NULL,
+  whatsapp VARCHAR(50),
+  email VARCHAR(255),
+  address TEXT,
+  tax_number VARCHAR(100),
+  cr_number VARCHAR(100),
+  payment_terms VARCHAR(50) DEFAULT 'NET_30',
+  credit_limit NUMERIC(14,2) DEFAULT 0,
+  current_balance NUMERIC(14,2) DEFAULT 0,
+  rating INT DEFAULT 5,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE purchase_orders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  po_number VARCHAR(100) UNIQUE NOT NULL,
+  supplier_id UUID NOT NULL REFERENCES suppliers(id),
+  order_date DATE NOT NULL,
+  expected_delivery_date DATE NOT NULL,
+  branch_id UUID REFERENCES branches(id),
+  subtotal NUMERIC(14,2) NOT NULL,
+  tax_amount NUMERIC(14,2) NOT NULL,
+  discount_amount NUMERIC(14,2) DEFAULT 0,
+  total_amount NUMERIC(14,2) NOT NULL,
+  status VARCHAR(50) DEFAULT 'DRAFT', -- DRAFT, APPROVED, SENT, RECEIVED, CANCELLED
+  payment_terms VARCHAR(100),
+  needs_approval BOOLEAN DEFAULT FALSE,
+  approved_by UUID REFERENCES users(id),
+  approved_at TIMESTAMPTZ,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE purchase_order_items (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+  raw_material_id UUID,
+  name VARCHAR(255) NOT NULL,
+  quantity NUMERIC(10,2) NOT NULL,
+  unit VARCHAR(50) NOT NULL,
+  unit_price NUMERIC(12,2) NOT NULL,
+  tax_percent NUMERIC(5,2) DEFAULT 15,
+  total NUMERIC(14,2) NOT NULL
+);
+
+-- 3. Unit 5: System Settings & Fiscal Periods
+CREATE TABLE system_settings (
+  key VARCHAR(100) PRIMARY KEY,
+  value JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Sync Outbox Engine (Offline Support)
+CREATE TABLE sync_outbox (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  idempotency_key VARCHAR(255) UNIQUE NOT NULL,
+  entity_type VARCHAR(100) NOT NULL,
+  action VARCHAR(50) NOT NULL,
+  payload JSONB NOT NULL,
+  attempts INT DEFAULT 0,
+  status VARCHAR(50) DEFAULT 'PENDING',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 `;
 
 export const PRISMA_SCHEMA = `// ====================================================================
